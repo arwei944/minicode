@@ -72,8 +72,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   <div class="thinking ready-hide" id="thinking"><span>思考中<span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div>
   <div id="input-area">
     <div id="input-wrap">
-      <textarea id="input" rows="1" placeholder="输入消息..." disabled></textarea>
-      <button id="send" disabled>
+      <textarea id="input" rows="1" placeholder="输入消息..." disabled onkeydown="onKey(event)" oninput="autoResize()"></textarea>
+      <button id="send" disabled onclick="send()">
         <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
       </button>
     </div>
