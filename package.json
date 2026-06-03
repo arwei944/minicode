@@ -1,6 +1,6 @@
 {
   "name": "minicode",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "极致精简的 AI 编码智能体 - 零外部依赖",
   "type": "module",
   "license": "MIT",
