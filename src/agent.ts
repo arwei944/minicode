@@ -4,7 +4,7 @@
 
 import { createSession, addMessage } from "./session"
 import { loadConfig } from "./config"
-import { getDefaultModel, getFreeModelIDs, fetchCatalog } from "./models"
+import { getDefaultModel, getFreeModelIDs, fetchCatalog, getModelBaseURL } from "./models"
 import { chat, type ChatMessage, type ToolDef, type ToolCall, FreeTierError } from "./llm"
 import { readTool } from "./tool/read"
 import { writeTool } from "./tool/write"
@@ -38,7 +38,7 @@ export async function runAgent(prompt: string, opts: AgentOptions = {}) {
   const session = createSession()
   const modelSpec = opts.model || config.model || getDefaultModel()
   const [providerID, modelID] = modelSpec.includes("/") ? modelSpec.split("/") : ["opencode", modelSpec]
-  const baseURL = providerID === "opencode" ? "https://models.dev/api" : undefined
+  const baseURL = getModelBaseURL(providerID)
   const apiKey = providerID === "opencode" ? undefined : config.provider?.[providerID]?.apiKey
 
   addMessage(session.id, { role: "user", content: prompt })

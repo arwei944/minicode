@@ -1,28 +1,22 @@
 /**
  * 模型目录管理 - 从 models.dev 拉取 + 免费模型过滤
- * 这是从 opencode 源码核心逻辑精简而来
  */
 
 const MODELS_URL = "https://models.dev/api.json"
-const FREE_MODEL_PRIORITY = ["gpt-5-nano", "big-pickle", "grok-code"]
-
-export interface ModelCost {
-  input: number
-  output?: number
-  cache?: { read?: number; write?: number }
-}
 
 export interface ModelInfo {
   id: string
   provider: string
   name: string
-  cost: ModelCost
+  cost: { input: number; output?: number }
   enabled: boolean
+  apiBaseURL?: string
 }
 
 export interface ProviderInfo {
   id: string
   name: string
+  api?: string
   models: ModelInfo[]
 }
 
@@ -34,46 +28,55 @@ export interface ModelCatalog {
 let _catalog: ModelCatalog | null = null
 
 export function getFreeModelIDs(): string[] {
-  if (!_catalog) return FREE_MODEL_PRIORITY
+  if (!_catalog) return ["opencode/gpt-5-nano", "opencode/big-pickle", "opencode/grok-code"]
   const free: ModelInfo[] = []
   for (const p of Object.values(_catalog.providers)) {
     for (const m of p.models) {
       if (m.enabled && m.cost.input === 0) free.push(m)
     }
   }
-  const sorted = FREE_MODEL_PRIORITY.map((id) => free.find((m) => m.id === id)).filter(Boolean) as ModelInfo[]
-  const rest = free.filter((m) => !FREE_MODEL_PRIORITY.includes(m.id))
+  const priority = ["big-pickle", "grok-code", "mimo-v2.5-free", "deepseek-v4-flash-free", "glm-4.7-free"]
+  const sorted = priority.map((id) => free.find((m) => m.id === id)).filter(Boolean) as ModelInfo[]
+  const rest = free.filter((m) => !priority.includes(m.id))
   return [...sorted, ...rest].map((m) => `${m.provider}/${m.id}`)
 }
 
 export async function fetchCatalog(): Promise<ModelCatalog> {
   const res = await fetch(MODELS_URL)
   if (!res.ok) throw new Error(`Failed to fetch model catalog: ${res.status}`)
-  const data = await res.json()
+  const data = await res.json() as Record<string, any>
 
   const catalog: ModelCatalog = { providers: {}, updatedAt: Date.now() }
   const hasKey = !!process.env.OPENCODE_API_KEY
 
-  for (const [pid, pdata] of Object.entries(data.providers || {})) {
-    const p = pdata as any
+  for (const [pid, pdata] of Object.entries(data)) {
+    if (!pdata.models || typeof pdata.models !== "object") continue
+
     const provider: ProviderInfo = {
       id: pid,
-      name: p.name || pid,
+      name: pdata.name || pid,
+      api: pdata.api,
       models: [],
     }
-    for (const [mid, mdata] of Object.entries(p.models || {})) {
-      const m = mdata as any
-      const cost = m.cost || { input: 0 }
+
+    for (const [mid, mdata] of Object.entries(pdata.models) as [string, any][]) {
+      const cost = mdata.cost || { input: 0 }
       const enabled = hasKey || (cost.input || 0) === 0
+      if (!enabled) continue // 只保留可用的（免费或有 Key）
+
       provider.models.push({
         id: mid,
         provider: pid,
-        name: m.name || mid,
-        cost: { input: cost.input || 0 },
-        enabled,
+        name: mdata.name || mid,
+        cost: { input: cost.input || 0, output: cost.output },
+        enabled: true,
+        apiBaseURL: pdata.api,
       })
     }
-    catalog.providers[pid] = provider
+
+    if (provider.models.length > 0) {
+      catalog.providers[pid] = provider
+    }
   }
 
   _catalog = catalog
@@ -81,12 +84,20 @@ export async function fetchCatalog(): Promise<ModelCatalog> {
 }
 
 export function getDefaultModel(): string {
-  if (!_catalog) return "gpt-5-nano"
+  if (!_catalog) return "opencode/big-pickle"
   const free = getFreeModelIDs()
-  return free[0] || "gpt-5-nano"
+  return free[0] || "opencode/big-pickle"
 }
 
 export function resolveModel(spec: string): { providerID: string; modelID: string } {
-  const [providerID, modelID] = spec.includes("/") ? spec.split("/") : ["opencode", spec]
-  return { providerID, modelID }
+  if (spec.includes("/")) {
+    const [providerID, ...rest] = spec.split("/")
+    return { providerID, modelID: rest.join("/") }
+  }
+  return { providerID: "opencode", modelID: spec }
+}
+
+export function getModelBaseURL(providerID: string): string | undefined {
+  if (!_catalog) return providerID === "opencode" ? "https://opencode.ai/zen/v1" : undefined
+  return _catalog.providers[providerID]?.api
 }
