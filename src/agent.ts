@@ -50,7 +50,9 @@ export async function runAgentWithMessages(
   if (opts.verbose) console.error(`[Agent] 模型: ${providerID}/${modelID}`)
 
   const systemPrompt = opts.system || config.systemPrompt || SYSTEM_PROMPT
-  let messages: ChatMessage[] = existingMessages ? [...existingMessages] : [{ role: "system", content: systemPrompt }]
+  const hasSystem = existingMessages?.some((m) => m.role === "system")
+  let messages: ChatMessage[] = existingMessages && existingMessages.length > 0 ? [...existingMessages] : []
+  if (!hasSystem) messages.unshift({ role: "system", content: systemPrompt })
   messages.push(...newMessages)
 
   const toolDefs = toolsToDefs(BUILTIN_TOOLS)

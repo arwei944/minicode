@@ -7,14 +7,14 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;font-size:14px;color:#1d1d1f;background:#f5f5f7;display:flex;user-select:none;-webkit-user-select:none}
-#sidebar{width:260px;background:rgba(255,255,255,.95);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-right:1px solid rgba(0,0,0,.08);display:flex;flex-direction:column;flex-shrink:0;transition:transform .2s ease}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;font-size:14px;color:#1d1d1f;background:#f5f5f7;display:flex}
+#sidebar{width:260px;background:rgba(255,255,255,.95);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-right:1px solid rgba(0,0,0,.08);display:flex;flex-direction:column;flex-shrink:0}
 #sidebar-header{padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,.05)}
 #sidebar-header h2{font-size:13px;font-weight:600;color:#1d1d1f;letter-spacing:-.01em}
 #new-session{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#1d1d1f;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
 #new-session:hover{background:rgba(0,0,0,.06)}
 #session-list{flex:1;overflow-y:auto;padding:8px}
-.session-item{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:#515154;transition:background .15s;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session-item{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:#515154;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .session-item:hover{background:rgba(0,0,0,.06)}
 .session-item.active{background:rgba(0,0,0,.1);color:#1d1d1f;font-weight:500}
 #sidebar-footer{padding:12px 16px;border-top:1px solid rgba(0,0,0,.05);font-size:11px;color:#86868b}
@@ -24,10 +24,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 #model-select{-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.05);border:none;border-radius:6px;padding:5px 24px 5px 10px;font-size:12px;color:#1d1d1f;cursor:pointer;outline:none;font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2386868B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;max-width:240px}
 #model-select:hover{background:rgba(0,0,0,.08)}
 #messages{flex:1;overflow-y:auto;padding:24px 20px 8px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}
-#messages:empty::after{content:'开始一段新对话';display:block;text-align:center;color:#86868b;padding:80px 0;font-size:13px}
 .msg{padding:12px 16px;line-height:1.6;font-size:14px;color:#1d1d1f;animation:fadeIn .2s ease;position:relative}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{color:#1d1d1f;font-weight:500}
+.msg.user{font-weight:500}
 .msg pre{background:#f5f5f7;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:14px;margin:10px 0;overflow-x:auto;position:relative}
 .msg pre code{font-family:'SF Mono','Cascadia Code','Fira Code','Consolas',monospace;font-size:13px;line-height:1.5;display:block;white-space:pre;color:#1d1d1f}
 .msg pre .lang{position:absolute;top:5px;right:10px;font-size:10px;color:#86868b;text-transform:uppercase;letter-spacing:.03em}
@@ -35,12 +34,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .msg p{margin:6px 0}
 .msg p:first-child{margin-top:0}
 .msg p:last-child{margin-bottom:0}
-#input-area{padding:12px 20px 20px;flex-shrink:0;background:transparent}
-#input-wrap{max-width:768px;margin:0 auto;display:flex;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:border-color .15s,box-shadow .15s}
+#input-area{padding:12px 20px 20px;flex-shrink:0}
+#input-wrap{max-width:768px;margin:0 auto;display:flex;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 #input-wrap:focus-within{border-color:rgba(0,0,0,.2);box-shadow:0 2px 12px rgba(0,0,0,.08)}
 #input{flex:1;border:none;outline:none;padding:8px 12px;font-size:14px;font-family:inherit;resize:none;min-height:36px;max-height:120px;line-height:1.4;color:#1d1d1f;background:transparent}
 #input::placeholder{color:#86868b}
-#send{width:36px;height:36px;border-radius:8px;border:none;background:#1d1d1f;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,opacity .15s}
+#send{width:36px;height:36px;border-radius:8px;border:none;background:#1d1d1f;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #send:hover{background:#000}#send:disabled{opacity:.3;cursor:not-allowed}
 #send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .thinking{text-align:center;padding:8px 20px;font-size:13px;color:#86868b;flex-shrink:0}
@@ -70,7 +69,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 <div id="main">
   <div id="topbar">
-    <svg onclick="toggleSidebar()" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;display:none" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     <h1>Minicode</h1>
     <select id="model-select" onchange="switchModel()"></select>
   </div>
@@ -86,25 +84,145 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   </div>
 </div>
 <script>
-let sessions=[],currentSessionId=null,loading=false,models=[]
-async function api(path,opts={}){const r=await fetch(path,{headers:{'Content-Type':'application/json'},...opts});return r.json()}
+let sessions=[],currentSessionId=null,loading=false
+
+async function api(path,opts={}){const r=await fetch(path,{headers:{'Content-Type':'application/json'},...opts});if(!r.ok)throw new Error((await r.json().catch(()=>({error:r.statusText}))).error||r.statusText);return r.json()}
+
 async function init(){await loadModels();await loadSessions()}
 init()
-async function loadModels(){const d=await api('/api/models');const sel=document.getElementById('model-select');sel.innerHTML='';for(const m of d.models||[]){const opt=document.createElement('option');opt.value=m.id;opt.textContent=m.label||m.id;if(m.id===d.default)opt.selected=true;sel.appendChild(opt)}models=d.models||[]}
+
+async function loadModels(){
+  const sel=document.getElementById('model-select')
+  try{
+    const d=await api('/api/models')
+    sel.innerHTML=''
+    for(const m of d.models||[]){
+      const opt=document.createElement('option')
+      opt.value=m.id;opt.textContent=m.label||m.id
+      if(m.id===d.default)opt.selected=true
+      sel.appendChild(opt)
+    }
+  }catch(e){sel.innerHTML='<option>加载失败</option>'}
+}
+
 function switchModel(){}
-async function loadSessions(){const d=await api('/api/sessions');sessions=d.sessions||[];renderSessionList();if(sessions.length>0&&!currentSessionId)selectSession(sessions[0].id)}
-function renderSessionList(){const el=document.getElementById('session-list');el.innerHTML='';for(const s of sessions){const div=document.createElement('div');div.className='session-item'+(s.id===currentSessionId?' active':'');div.textContent=s.name||s.id.slice(0,8);div.onclick=()=>selectSession(s.id);el.appendChild(div)}}
-async function selectSession(id){currentSessionId=id;renderSessionList();const d=await api('/api/sessions/'+id+'/messages');renderMessages(d.messages||[])}
-async function newSession(){const model=document.getElementById('model-select').value;const d=await api('/api/sessions',{method:'POST',body:JSON.stringify({model})});sessions.push({id:d.id,name:d.name||'新会话'});currentSessionId=d.id;renderSessionList();renderMessages([]);document.getElementById('messages').scrollTop=0;document.getElementById('input').focus()}
+
+async function loadSessions(){
+  try{
+    const d=await api('/api/sessions')
+    sessions=d.sessions||[]
+    renderSessionList()
+    if(sessions.length>0){selectSession(sessions[0].id)}
+    else{newSession()}
+  }catch(e){newSession()}
+}
+
+function renderSessionList(){
+  const el=document.getElementById('session-list')
+  el.innerHTML=''
+  for(const s of sessions){
+    const div=document.createElement('div')
+    div.className='session-item'+(s.id===currentSessionId?' active':'')
+    div.textContent=s.name||s.id.slice(0,8)
+    div.onclick=()=>selectSession(s.id)
+    el.appendChild(div)
+  }
+}
+
+async function selectSession(id){
+  currentSessionId=id
+  renderSessionList()
+  try{
+    const d=await api('/api/sessions/'+id+'/messages')
+    renderMessages(d.messages||[])
+  }catch(e){renderMessages([])}
+}
+
+async function newSession(){
+  const model=document.getElementById('model-select').value
+  const d=await api('/api/sessions',{method:'POST',body:JSON.stringify({model})})
+  sessions.push({id:d.id,name:d.name||'新会话'})
+  currentSessionId=d.id
+  renderSessionList()
+  renderMessages([])
+  document.getElementById('input').focus()
+}
+
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function render(text){let html='',i=0;while(i<text.length){const start=text.indexOf('```',i);if(start===-1){html+='<p>'+esc(text.slice(i)).replace(/\n/g,'<br>')+'</p>';break}html+='<p>'+esc(text.slice(i,start)).replace(/\n/g,'<br>')+'</p>';const end=text.indexOf('```',start+3);if(end===-1){html+='<p>'+esc(text.slice(start)).replace(/\n/g,'<br>')+'</p>';break}const block=text.slice(start+3,end);const firstNl=block.indexOf('\n');const lang=firstNl===-1?'':block.slice(0,firstNl).trim();const code=firstNl===-1?block:block.slice(firstNl+1);html+='<pre><span class="lang">'+(lang||'code')+'</span><code>'+esc(code)+'</code></pre>';i=end+3}html=html.replace(/`([^`\n]+)`/g,'<code>$1</code>');return html}
-function renderMessages(msgs){const el=document.getElementById('messages');el.innerHTML='';for(const m of msgs){if(m.role==='system'||m.role==='tool')continue;const div=document.createElement('div');div.className='msg '+m.role;if(m.role==='assistant'){div.innerHTML=render(m.content||'')}else{div.textContent=m.content||''}el.appendChild(div)}el.scrollTop=el.scrollHeight}
-function addAssistantMessage(content){const el=document.getElementById('messages');const div=document.createElement('div');div.className='msg assistant';div.innerHTML=render(content);el.appendChild(div);el.scrollTop=el.scrollHeight}
-function addUserMessage(content){const el=document.getElementById('messages');const div=document.createElement('div');div.className='msg user';div.textContent=content;el.appendChild(div);el.scrollTop=el.scrollHeight}
-function autoResize(){const el=document.getElementById('input');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';document.getElementById('send').disabled=!el.value.trim()}
+
+function render(text){
+  let html='',i=0
+  while(i<text.length){
+    const start=text.indexOf('```',i)
+    if(start===-1){html+='<p>'+esc(text.slice(i)).replace(/\n/g,'<br>')+'</p>';break}
+    html+='<p>'+esc(text.slice(i,start)).replace(/\n/g,'<br>')+'</p>'
+    const end=text.indexOf('```',start+3)
+    if(end===-1){html+='<p>'+esc(text.slice(start)).replace(/\n/g,'<br>')+'</p>';break}
+    const block=text.slice(start+3,end)
+    const firstNl=block.indexOf('\n')
+    const lang=firstNl===-1?'':block.slice(0,firstNl).trim()
+    const code=firstNl===-1?block:block.slice(firstNl+1)
+    html+='<pre><span class="lang">'+(lang||'code')+'</span><code>'+esc(code)+'</code></pre>'
+    i=end+3
+  }
+  return html
+}
+
+function renderMessages(msgs){
+  const el=document.getElementById('messages')
+  el.innerHTML=''
+  for(const m of msgs){
+    if(m.role==='system'||m.role==='tool')continue
+    const div=document.createElement('div')
+    div.className='msg '+m.role
+    if(m.role==='assistant'){div.innerHTML=render(m.content||'')}
+    else{div.textContent=m.content||''}
+    el.appendChild(div)
+  }
+  el.scrollTop=el.scrollHeight
+}
+
+function addAssistantMessage(content){
+  const el=document.getElementById('messages')
+  const div=document.createElement('div');div.className='msg assistant';div.innerHTML=render(content)
+  el.appendChild(div);el.scrollTop=el.scrollHeight
+}
+
+function addUserMessage(content){
+  const el=document.getElementById('messages')
+  const div=document.createElement('div');div.className='msg user';div.textContent=content
+  el.appendChild(div);el.scrollTop=el.scrollHeight
+}
+
+function autoResize(){
+  const el=document.getElementById('input')
+  el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'
+  document.getElementById('send').disabled=loading||!el.value.trim()
+}
+
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}}
-async function send(){if(loading||!currentSessionId)return;const input=document.getElementById('input');const text=input.value.trim();if(!text)return;input.value='';autoResize();addUserMessage(text);loading=true;document.getElementById('send').disabled=true;document.getElementById('thinking').style.display='block';try{const d=await api('/api/sessions/'+currentSessionId+'/chat',{method:'POST',body:JSON.stringify({prompt:text})});if(d.error){const el=document.getElementById('messages');const div=document.createElement('div');div.className='msg error';div.textContent=d.error;el.appendChild(div);el.scrollTop=el.scrollHeight}else{const si=sessions.find(s=>s.id===currentSessionId);if(si&&d.name)si.name=d.name;renderSessionList();if(d.text)addAssistantMessage(d.text)}}catch(e){const el=document.getElementById('messages');const div=document.createElement('div');div.className='msg error';div.textContent=e.message;el.appendChild(div);el.scrollTop=el.scrollHeight}finally{loading=false;document.getElementById('send').disabled=false;document.getElementById('thinking').style.display='none';input.focus()}}
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+
+async function send(){
+  if(loading||!currentSessionId)return
+  const input=document.getElementById('input')
+  const text=input.value.trim()
+  if(!text)return
+  input.value='';autoResize()
+  addUserMessage(text)
+  loading=true;document.getElementById('send').disabled=true;document.getElementById('thinking').style.display='block'
+  try{
+    const d=await api('/api/sessions/'+currentSessionId+'/chat',{method:'POST',body:JSON.stringify({prompt:text})})
+    if(d.text)addAssistantMessage(d.text)
+    const si=sessions.find(s=>s.id===currentSessionId)
+    if(si&&d.name)si.name=d.name
+    renderSessionList()
+  }catch(e){
+    const el=document.getElementById('messages')
+    const div=document.createElement('div');div.className='msg error';div.textContent='错误: '+e.message
+    el.appendChild(div);el.scrollTop=el.scrollHeight
+  }
+  loading=false;document.getElementById('send').disabled=false;document.getElementById('thinking').style.display='none';input.focus()
+}
 </script>
 </body>
 </html>
