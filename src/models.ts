@@ -41,6 +41,16 @@ export function getFreeModelIDs(): string[] {
   return [...sorted, ...rest].map((m) => `${m.provider}/${m.id}`)
 }
 
+export function getOpenCodeFreeModels(): string[] {
+  if (!_catalog) return ["opencode/big-pickle", "opencode/grok-code", "opencode/deepseek-v4-flash-free"]
+  const prov = _catalog.providers["opencode"]
+  if (!prov) return getFreeModelIDs().filter((id) => id.startsWith("opencode/"))
+  const priority = ["big-pickle", "grok-code", "mimo-v2.5-free", "deepseek-v4-flash-free", "glm-4.7-free"]
+  const sorted = priority.map((id) => prov.models.find((m) => m.id === id)).filter(Boolean) as ModelInfo[]
+  const rest = prov.models.filter((m) => !priority.includes(m.id) && m.cost.input === 0)
+  return [...sorted, ...rest].map((m) => `opencode/${m.id}`)
+}
+
 export async function fetchCatalog(): Promise<ModelCatalog> {
   const res = await fetch(MODELS_URL)
   if (!res.ok) throw new Error(`Failed to fetch model catalog: ${res.status}`)

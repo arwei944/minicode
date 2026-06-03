@@ -1,5 +1,5 @@
 import { runAgentWithMessages, type AgentResult } from "./agent"
-import { getDefaultModel, getFreeModelIDs, fetchCatalog, getModelBaseURL } from "./models"
+import { getDefaultModel, getOpenCodeFreeModels, fetchCatalog, getModelBaseURL } from "./models"
 import { loadConfig } from "./config"
 import type { ChatMessage } from "./llm"
 
@@ -66,11 +66,11 @@ Bun.serve({
 
     // 模型列表
     if (url.pathname === "/api/models" && req.method === "GET") {
-      const free = getFreeModelIDs()
+      const models = getOpenCodeFreeModels()
       const def = getDefaultModel()
       return Response.json({
         default: def,
-        models: free.map((id) => ({ id, label: id.replace(/^opencode\//, "") })),
+        models: models.map((id) => ({ id, label: id.replace(/^opencode\//, "") })),
       })
     }
 
