@@ -22,6 +22,7 @@
 - **6 大核心工具** — read / write / edit / grep / glob / shell
 - **跨平台** — Windows / macOS / Linux
 - **Web 界面** — `bun run serve` 浏览器中使用
+- **一键启动** — Windows 桌面快捷方式，自动拉取+启动+开浏览器
 - **极致精简** — 17 个源文件，1200 行代码
 
 ## 安装
@@ -68,8 +69,18 @@ bun run serve
 打开浏览器访问 `http://localhost:3000`，在 Mac 风格图形界面中使用 Minicode：
 
 - **会话栏** — 左侧管理多条会话，点击切换
-- **模型选择** — 顶部下拉框切换 200+ 免费模型
+- **模型选择** — 顶部下拉框切换 701 个免费模型
 - **多轮对话** — 同一会话连续对话，上下文完整保留
+
+### Windows 桌面快捷方式（一键启动）
+
+```powershell
+# 首次：双击桌面 Minicode.lnk 即可
+# 自动执行：git pull → 启动服务 → 打开浏览器
+# 按 Enter 停止服务并关闭窗口
+```
+
+脚本位于 `minicode.ps1`，放在仓库根目录。每次 `git pull` 自动更新。
 
 ## 免费模型
 
