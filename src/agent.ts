@@ -75,14 +75,18 @@ export async function runAgent(prompt: string, opts: AgentOptions = {}) {
 
     if (!result.tool_calls || result.tool_calls.length === 0) break
 
-    // 处理工具调用
+    // 将所有 tool_calls 合并到一条 assistant 消息
+    messages.push({
+      role: "assistant",
+      content: result.content || "",
+      tool_calls: result.tool_calls.map((tc) => ({
+        id: tc.id,
+        type: "function" as const,
+        function: { name: tc.function.name, arguments: tc.function.arguments },
+      })),
+    })
+
     for (const tc of result.tool_calls) {
-      messages.push({
-        role: "assistant",
-        content: "",
-        tool_call_id: tc.id,
-        name: tc.function.name,
-      })
 
       try {
         const args = JSON.parse(tc.function.arguments)

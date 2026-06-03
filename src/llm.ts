@@ -9,11 +9,18 @@ export interface LLMConfig {
   model: string
 }
 
+export interface ToolCallData {
+  id: string
+  type: "function"
+  function: { name: string; arguments: string }
+}
+
 export interface ChatMessage {
   role: "user" | "assistant" | "system" | "tool"
   content: string
   tool_call_id?: string
   name?: string
+  tool_calls?: ToolCallData[]
 }
 
 export interface ToolDef {
