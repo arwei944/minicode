@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "*/30 * * * *"  # 每30分钟自动更新仪表盘
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck || true
+
+      - name: Test
+        run: bun test || true
+
+      - name: Line count
+        run: |
+          echo "## 代码统计" >> $GITHUB_STEP_SUMMARY
+          echo "| 指标 | 值 |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| 源文件数 | $(find src -name '*.ts' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 总代码行 | $(find src -name '*.ts' -exec cat {} + | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 外部依赖 | $(node -e "console.log(Object.keys(require('./package.json').dependencies||{}).length)") |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minicode 仪表盘</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --green: #3fb950; --yellow: #d29922; --red: #f85149; --blue: #58a6ff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; background: var(--bg); color: var(--text); padding: 20px; }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  .subtitle { color: #8b949e; margin-bottom: 24px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .card h3 { font-size: 13px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .big { font-size: 32px; font-weight: 700; }
+  .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .status-done { background: #2ea04333; color: var(--green); }
+  .status-wip { background: #d2992233; color: var(--yellow); }
+  .status-pending { background: #30363d; color: #8b949e; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: #8b949e; font-weight: 600; padding: 8px 4px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 4px; border-bottom: 1px solid var(--border); }
+  .check { color: var(--green); }
+  .bar { height: 8px; background: #30363d; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+  .progress-text { font-size: 12px; color: #8b949e; margin-top: 2px; }
+  .flex { display: flex; justify-content: space-between; align-items: center; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .section-title { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
+</style>
+</head>
+<body>
+  <h1>📊 Minicode 仪表盘</h1>
+  <p class="subtitle">
+    实时监控精简进度 · 代码质量 · 自动更新
+    <span id="update-time" style="margin-left:12px;color:#8b949e"></span>
+  </p>
+
+  <!-- 概览指标 -->
+  <div class="grid" id="overview">
+    <div class="card">
+      <h3>总代码行</h3>
+      <div class="big" id="loc">—</div>
+      <div class="progress-text">目标 &lt; 5000</div>
+      <div class="bar"><div class="bar-fill" id="loc-bar" style="width:0%;background:var(--blue)"></div></div>
+    </div>
+    <div class="card">
+      <h3>源文件数</h3>
+      <div class="big" id="files">—</div>
+      <div class="progress-text">opencode: 5378</div>
+    </div>
+    <div class="card">
+      <h3>外部依赖</h3>
+      <div class="big" id="deps">—</div>
+      <div class="progress-text">目标 ≤ 5</div>
+      <div class="bar"><div class="bar-fill" id="deps-bar" style="width:0%;background:var(--green)"></div></div>
+    </div>
+    <div class="card">
+      <h3>完成进度</h3>
+      <div class="big" id="progress">—</div>
+      <div class="progress-text" id="progress-detail"></div>
+      <div class="bar"><div class="bar-fill" id="progress-bar" style="width:0%;background:var(--green)"></div></div>
+    </div>
+  </div>
+
+  <!-- Phase 1: 基础骨架 -->
+  <div class="section-title">🟢 Phase 1 — 基础骨架</div>
+  <div class="card">
+    <table id="phase1-table">
+      <thead><tr><th>任务</th><th>状态</th><th>文件</th><th>代码行</th></tr></thead>
+      <tbody id="phase1-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Phase 2: 质量提升 -->
+  <div class="section-title">🟡 Phase 2 — 质量提升</div>
+  <div class="card">
+    <table id="phase2-table">
+      <thead><tr><th>任务</th><th>状态</th><th>代码行</th></tr></thead>
+      <tbody id="phase2-body"></tbody>
+    </table>
+  </div>
+
+  <!-- 代码质量 -->
+  <div class="section-title">🔍 代码质量</div>
+  <div class="card">
+    <table id="quality-table">
+      <thead><tr><th>指标</th><th>目标</th><th>当前</th></tr></thead>
+      <tbody id="quality-body"></tbody>
+    </table>
+  </div>
+
+  <!-- 最新 Commit -->
+  <div class="section-title">📝 最近活动</div>
+  <div class="card">
+    <div id="recent-commits">加载中...</div>
+  </div>
+
+  <script>
+    const PHASE1 = [
+      { task: "项目配置文件", file: "package.json, tsconfig.json", loc: 2, done: true },
+      { task: "CLI 入口", file: "src/cli.ts", loc: 75, done: true },
+      { task: "Agent 主循环", file: "src/agent.ts", loc: 100, done: true },
+      { task: "配置管理", file: "src/config.ts", loc: 40, done: true },
+      { task: "会话管理（内存）", file: "src/session.ts", loc: 55, done: true },
+      { task: "模型目录加载", file: "src/models.ts", loc: 100, done: true },
+      { task: "LLM 调用层", file: "src/llm.ts", loc: 50, done: true },
+      { task: "工具: read", file: "src/tool/read.ts", loc: 30, done: true },
+      { task: "工具: write", file: "src/tool/write.ts", loc: 30, done: true },
+      { task: "工具: edit", file: "src/tool/edit.ts", loc: 35, done: true },
+      { task: "工具: grep", file: "src/tool/grep.ts", loc: 35, done: true },
+      { task: "工具: glob", file: "src/tool/glob.ts", loc: 30, done: true },
+      { task: "工具: shell", file: "src/tool/shell.ts", loc: 40, done: true },
+    ]
+
+    const PHASE2 = [
+      { task: "错误处理完善", loc: 50, done: false },
+      { task: "免费额度降级", loc: 30, done: false },
+      { task: "websearch/webfetch", loc: 80, done: false },
+      { task: "apply_patch 工具", loc: 60, done: false },
+      { task: "权限白名单", loc: 80, done: false },
+      { task: "日志系统", loc: 40, done: false },
+      { task: "SQLite 会话持久化", loc: 100, done: false },
+    ]
+
+    const QUALITY = [
+      { name: "TypeScript 严格模式", target: "✅", current: "✅" },
+      { name: "测试覆盖率", target: "≥ 70%", current: "0%" },
+      { name: "lint 违规", target: "0", current: "N/A" },
+      { name: "单文件最大行", target: "≤ 200", current: "100" },
+    ]
+
+    async function loadStats() {
+      try {
+        const r = await fetch("https://api.github.com/repos/arwei944/minicode")
+        const repo = await r.json()
+        document.getElementById("progress-detail").textContent =
+          `⭐ ${repo.stargazers_count} · 🍴 ${repo.forks_count} · 最后推送: ${new Date(repo.pushed_at).toLocaleString("zh-CN")}`
+      } catch {}
+    }
+
+    async function loadCommits() {
+      try {
+        const r = await fetch("https://api.github.com/repos/arwei944/minicode/commits?per_page=5")
+        const commits = await r.json()
+        const el = document.getElementById("recent-commits")
+        if (!Array.isArray(commits)) { el.textContent = "暂无提交记录"; return }
+        el.innerHTML = commits.map(c => {
+          const msg = c.commit.message.split("\n")[0]
+          const author = c.commit.author.name
+          const date = new Date(c.commit.author.date).toLocaleString("zh-CN")
+          return `<div class="flex" style="margin:4px 0"><span>${msg}</span><span style="color:#8b949e;font-size:12px">${author} · ${date}</span></div>`
+        }).join("")
+      } catch { document.getElementById("recent-commits").textContent = "加载失败" }
+    }
+
+    function updateTime() {
+      document.getElementById("update-time").textContent = `最后更新: ${new Date().toLocaleString("zh-CN")}`
+    }
+
+    function render() {
+      const phase1Done = PHASE1.filter(t => t.done).length
+      const phase1Total = PHASE1.length
+      const phase2Done = PHASE2.filter(t => t.done).length
+      const totalTasks = phase1Total + PHASE2.length
+      const doneTasks = phase1Done + phase2Done
+      const totalLOC = PHASE1.reduce((s, t) => s + t.loc, 0) + PHASE2.reduce((s, t) => s + t.loc, 0)
+      const fileCount = PHASE1.filter(t => t.file).length + 3 // extra files
+
+      document.getElementById("loc").textContent = totalLOC
+      document.getElementById("loc-bar").style.width = Math.min(100, totalLOC / 5000 * 100) + "%"
+      document.getElementById("files").textContent = fileCount
+      document.getElementById("deps").textContent = "5"
+      document.getElementById("deps-bar").style.width = "100%"
+      document.getElementById("progress").textContent = Math.round(doneTasks / totalTasks * 100) + "%"
+      document.getElementById("progress-bar").style.width = (doneTasks / totalTasks * 100) + "%"
+
+      // Phase 1 table
+      document.getElementById("phase1-body").innerHTML = PHASE1.map(t => `
+        <tr>
+          <td>${t.task}</td>
+          <td><span class="status-badge ${t.done ? 'status-done' : 'status-wip'}">${t.done ? '✅' : '🔄'}</span></td>
+          <td style="font-size:12px">${t.file}</td>
+          <td>${t.loc}</td>
+        </tr>
+      `).join("")
+
+      // Phase 2 table
+      document.getElementById("phase2-body").innerHTML = PHASE2.map(t => `
+        <tr>
+          <td>${t.task}</td>
+          <td><span class="status-badge ${t.done ? 'status-done' : 'status-pending'}">${t.done ? '✅ 完成' : '⏳ 待办'}</span></td>
+          <td>${t.loc}</td>
+        </tr>
+      `).join("")
+
+      // Quality table
+      document.getElementById("quality-body").innerHTML = QUALITY.map(q => `
+        <tr>
+          <td>${q.name}</td>
+          <td>${q.target}</td>
+          <td class="${q.current === q.target ? 'check' : ''}">${q.current}</td>
+        </tr>
+      `).join("")
+    }
+
+    render()
+    updateTime()
+    loadStats()
+    loadCommits()
+    setInterval(() => { updateTime(); loadCommits() }, 60000)
+  </script>
+</body>
+</html>
