@@ -22,7 +22,7 @@
 - **6 大核心工具** — read / write / edit / grep / glob / shell
 - **跨平台** — Windows / macOS / Linux
 - **Web 界面** — `bun run serve` 浏览器中使用
-- **极致精简** — 16 个源文件，1000 行代码
+- **极致精简** — 17 个源文件，1200 行代码
 
 ## 安装
 
@@ -59,15 +59,17 @@ bun run dev models
 cat main.py | bun run dev pipe
 ```
 
-### Web 界面
+### Web 界面（推荐）
 
 ```bash
 bun run serve
 ```
 
-打开浏览器访问 `http://localhost:3000`，在图形界面中使用 Minicode：
+打开浏览器访问 `http://localhost:3000`，在 Mac 风格图形界面中使用 Minicode：
 
-![Web 界面](https://img.shields.io/badge/界面-暗色风格-0d1117)
+- **会话栏** — 左侧管理多条会话，点击切换
+- **模型选择** — 顶部下拉框切换 200+ 免费模型
+- **多轮对话** — 同一会话连续对话，上下文完整保留
 
 ## 免费模型
 
