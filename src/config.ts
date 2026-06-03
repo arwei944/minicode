@@ -8,7 +8,7 @@ export interface Config {
 }
 
 function configDir(): string {
-  const env = process.env.XDG_CONFIG_HOME || process.env.HOME
+  const env = process.env.XDG_CONFIG_HOME || process.env.HOME || process.env.USERPROFILE
   if (!env) throw new Error("Cannot find config directory")
   const dir = path.join(env, ".config", "minicode")
   mkdirSync(dir, { recursive: true })

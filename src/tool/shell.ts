@@ -1,4 +1,3 @@
-import { execSync } from "child_process"
 import type { Tool, ToolContext, ToolResult } from "./tool"
 
 export const shellTool: Tool = {
@@ -14,18 +13,16 @@ export const shellTool: Tool = {
   },
   async execute(args: Record<string, unknown>, _ctx: ToolContext): Promise<ToolResult> {
     const cmd = args.command as string
-    const dir = (args.workdir as string) || process.cwd()
+    const dir = (args.workdir as string) || "."
     try {
-      const out = execSync(cmd, {
+      const proc = Bun.spawnSync([process.platform === "win32" ? "cmd" : "sh", process.platform === "win32" ? "/c" : "-c", cmd], {
         cwd: dir,
-        encoding: "utf-8",
-        maxBuffer: 5 * 1024 * 1024,
         timeout: 60000,
       })
+      const out = proc.stdout.toString() + proc.stderr.toString()
       return { content: out || "(命令执行完毕，无输出)" }
     } catch (e: any) {
-      const msg = e.stderr || e.message || String(e)
-      return { content: `执行失败:\n${msg}` }
+      return { content: `执行失败:\n${e.message}` }
     }
   },
 }
