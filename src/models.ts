@@ -3,6 +3,9 @@
  */
 
 const MODELS_URL = "https://models.dev/api.json"
+const OPENCODE_API = "https://opencode.ai/zen/v1"
+// 实际可用免费模型（opencode.ai/zen/v1 仅支持这些）
+const WORKING_FREE = ["deepseek-v4-flash-free", "big-pickle", "mimo-v2.5-free", "nemotron-3-super-free"]
 
 export interface ModelInfo {
   id: string
@@ -28,27 +31,11 @@ export interface ModelCatalog {
 let _catalog: ModelCatalog | null = null
 
 export function getFreeModelIDs(): string[] {
-  if (!_catalog) return ["opencode/deepseek-v4-flash-free", "opencode/big-pickle", "opencode/mimo-v2.5-free", "opencode/grok-code", "opencode/glm-4.7-free", "opencode/ring-2.6-1t-free"]
-  const free: ModelInfo[] = []
-  for (const p of Object.values(_catalog.providers)) {
-    for (const m of p.models) {
-      if (m.enabled && m.cost.input === 0) free.push(m)
-    }
-  }
-  const priority = ["deepseek-v4-flash-free", "big-pickle", "mimo-v2.5-free", "grok-code", "ring-2.6-1t-free", "glm-4.7-free"]
-  const sorted = priority.map((id) => free.find((m) => m.id === id)).filter(Boolean) as ModelInfo[]
-  const rest = free.filter((m) => !priority.includes(m.id))
-  return [...sorted, ...rest].map((m) => `${m.provider}/${m.id}`)
+  return WORKING_FREE.map((id) => `opencode/${id}`)
 }
 
 export function getOpenCodeFreeModels(): string[] {
-  if (!_catalog) return ["opencode/deepseek-v4-flash-free", "opencode/big-pickle", "opencode/mimo-v2.5-free", "opencode/grok-code", "opencode/glm-4.7-free", "opencode/ring-2.6-1t-free", "opencode/nemotron-3-super-free"]
-  const prov = _catalog.providers["opencode"]
-  if (!prov) return getFreeModelIDs().filter((id) => id.startsWith("opencode/"))
-  const priority = ["deepseek-v4-flash-free", "big-pickle", "mimo-v2.5-free", "grok-code", "ring-2.6-1t-free", "glm-4.7-free"]
-  const sorted = priority.map((id) => prov.models.find((m) => m.id === id)).filter(Boolean) as ModelInfo[]
-  const rest = prov.models.filter((m) => !priority.includes(m.id) && m.cost.input === 0)
-  return [...sorted, ...rest].map((m) => `opencode/${m.id}`)
+  return WORKING_FREE.map((id) => `opencode/${id}`)
 }
 
 export async function fetchCatalog(): Promise<ModelCatalog> {
@@ -94,9 +81,7 @@ export async function fetchCatalog(): Promise<ModelCatalog> {
 }
 
 export function getDefaultModel(): string {
-  if (!_catalog) return "opencode/deepseek-v4-flash-free"
-  const free = getFreeModelIDs()
-  return free[0] || "opencode/deepseek-v4-flash-free"
+  return "opencode/deepseek-v4-flash-free"
 }
 
 export function resolveModel(spec: string): { providerID: string; modelID: string } {
@@ -108,8 +93,7 @@ export function resolveModel(spec: string): { providerID: string; modelID: strin
 }
 
 export function getModelBaseURL(providerID: string): string | undefined {
-  // opencode 免费模型全部通过 models.dev/api 工作（zen/v1 仅支持 4/19）
-  if (!_catalog) return providerID === "opencode" ? "https://models.dev/api" : undefined
-  if (providerID === "opencode") return "https://models.dev/api"
+  if (providerID === "opencode") return OPENCODE_API
+  if (!_catalog) return undefined
   return _catalog.providers[providerID]?.api
 }
