@@ -21,7 +21,8 @@
 - **200+ 免费模型** — 通过 models.dev / opencode Zen 免费使用
 - **6 大核心工具** — read / write / edit / grep / glob / shell
 - **跨平台** — Windows / macOS / Linux
-- **极致精简** — 15 个源文件，800 行代码
+- **Web 界面** — `bun run serve` 浏览器中使用
+- **极致精简** — 16 个源文件，1000 行代码
 
 ## 安装
 
@@ -57,6 +58,16 @@ bun run dev models
 ```bash
 cat main.py | bun run dev pipe
 ```
+
+### Web 界面
+
+```bash
+bun run serve
+```
+
+打开浏览器访问 `http://localhost:3000`，在图形界面中使用 Minicode：
+
+![Web 界面](https://img.shields.io/badge/界面-暗色风格-0d1117)
 
 ## 免费模型
 

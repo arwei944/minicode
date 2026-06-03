@@ -7,8 +7,9 @@
   "bin": { "minicode": "./src/cli.ts" },
   "scripts": {
     "dev": "bun run src/cli.ts",
+    "serve": "bun run src/server.ts",
     "start": "node --experimental-strip-types src/cli.ts",
-    "models:fetch": "bun run src/cli.ts models",
+    "models": "bun run src/cli.ts models",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
